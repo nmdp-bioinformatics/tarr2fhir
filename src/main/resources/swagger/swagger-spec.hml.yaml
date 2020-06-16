@@ -1,0 +1,34 @@
+swagger: '2.0'
+
+info:
+  version: "1.0"
+  title: tarr2fhir converter api
+  description: Convert Gendx Xml files from Versiti to FHIR
+
+schemes:
+- https
+- http
+
+basePath: /v1
+
+paths:
+  /tarr/convert2Fhir:
+    post:
+      operationId: tarr2fhir
+      consumes:
+      - application/xml
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: xml
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Return the json bundle
+          schema:
+            type: string
+        "500":
+          description: ErrorException
