@@ -30,22 +30,23 @@ The API currently accepts a single input Xml generated based on the Tarr.xsd (av
 - After checking out the code, please run the following - 
    - mvn clean
    - mvn install
-- Run the application with the following command :
+- Start the application with the following command :
    - java -jar tarr2fhir-0.0.1-SNAPSHOT.jar
 
 
 ### Testing
 - With the application launched locally, the API will be available at
   - http://localhost:8099/tarr/convert2fhir
-  - POST a single gendx format "xml" to this using POSTman or curl
+  - POST a single gendx format "xml" to this using POSTman or curl - the support for "zip" upload will be made available soon
   - Use these headers: 
     - Content-type: application/xml
   - Response:
     - 200 OK
       - Json fhir transaction Bundle containing the following resources:
-         - Patient
          - Specimen
          - DiagnosticReport
+         - Observation - genotype level
+         - Bundle
     - if there are errors, standard error messages will be received 
 - The API health can be tested by calling one of the two actuator end-points that are enabled as part of spring-boot application setup
   - http://localhost:8099/actuator/health
@@ -62,12 +63,12 @@ The API currently accepts a single input Xml generated based on the Tarr.xsd (av
         - [ ] Possible new API EP for zip file input
 
 2. The Resources generated only include the following:
-   - Patient 
    - Specimen
    - DiagnosticReport
    - Bundle
+   - Observation
    - #### _Tasks_
-        - [ ] Observation (both allele level and genotype level)
+        - [ ] Observation (both allele level)
         - [ ] Provenance
         - [ ] Device
         - [ ] Organization
