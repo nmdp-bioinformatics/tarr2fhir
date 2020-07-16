@@ -22,7 +22,7 @@ public class SpecimenMap implements Converter<SampleXml, Specimen>
         SampleXml aSampleXml = context.getSource();
         ModelMapper mapper = createMapper();
         Identifier aPatientIdentifer = new Identifier();
-        aPatientIdentifer.setSystem("http://cibmtr.org/identifier/tarr-sample-name");
+        aPatientIdentifer.setSystem("http://terminology.cibmtr.org/identifier/tarr-sample-name");
         aPatientIdentifer.setValue(aSampleXml.getName());
         aSpecimen.addIdentifier(aPatientIdentifer);
         aSpecimen.setId(IdType.newRandomUuid());
