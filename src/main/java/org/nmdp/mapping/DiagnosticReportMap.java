@@ -1,57 +1,62 @@
 package org.nmdp.mapping;
 
+import org.hl7.fhir.r4.model.CanonicalType;
 import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DiagnosticReport;
-import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Meta;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;
-import org.nmdp.gendxdatamodels.SampleXml;
+import org.nmdp.fhirsubmission.hapi.models.CodingSetup;
+import org.nmdp.fhirsubmission.hapi.models.ExtensionSetup;
+import org.nmdp.gendxdatamodels.LocusTARR;
+import org.nmdp.tarrbean.SampleBean;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DiagnosticReportMap implements Converter<SampleXml, DiagnosticReport>{
+public class DiagnosticReportMap implements Converter<SampleBean, DiagnosticReport>{
 
-    public DiagnosticReport convert(MappingContext<SampleXml, DiagnosticReport> context)
+    public DiagnosticReport convert(MappingContext<SampleBean, DiagnosticReport> context)
     {
         if (context.getSource() == null) {
             return null;
         }
-        SampleXml aSampleXml = context.getSource();
-        String aGlString  = aSampleXml.getLoci().getLocus().get(0).getTypingResult().getGLString();
+        SampleBean aSampleXml = context.getSource();
         DiagnosticReport aDiagnosticReport = new DiagnosticReport();
         aDiagnosticReport.setStatus(DiagnosticReport.DiagnosticReportStatus.FINAL);
-
-        Extension aExtension = new Extension();
-        List<Extension> aExtensionList = new ArrayList<>();
-        aExtension.setUrl("http://fhir.nmdp.org/ig/hla-reporting/StructureDefinition/hla-genotype-summary");
-        CodeableConcept aCodableConcept = new CodeableConcept();
-        Coding aExtensionCoding = new Coding();
-        aExtensionCoding.setSystem("http://glstring.org");
-        aExtensionCoding.setCode(aGlString);
-        List<Coding> aExtensionCodingList = new ArrayList<>();
-        aExtensionCodingList.add(aExtensionCoding);
-        aCodableConcept.setCoding(aExtensionCodingList);
-        aExtension.setValue(aCodableConcept);
-        aExtensionList.add(aExtension);
-        aDiagnosticReport.setExtension(aExtensionList);
+        ExtensionSetup aExtensions = new ExtensionSetup();
+        aSampleXml.getMyListLocusTarr().stream().forEach(aLocus -> createGlStringCodableConcept(aLocus, aExtensions));
+        aDiagnosticReport.setExtension(aExtensions.getMyExtensions());
 
         CodeableConcept aDRCodableConcept = new CodeableConcept();
-        List<Coding> aDRCodingList = new ArrayList<>();
-        Coding aLoincCoding = new Coding();
-        aLoincCoding.setSystem("http://loinc.org");
-        aLoincCoding.setCode("81247-9");
-        aLoincCoding.setDisplay("Master HL7 genetic variant reporting panel");
-        Coding aGeneNameCoding = new Coding();
-        aGeneNameCoding.setSystem("http://www.genenames.org/genegroup");
-        aGeneNameCoding.setCode("588");
-        aGeneNameCoding.setDisplay("Histocompatibility complex (HLA)");
-        aDRCodingList.add(aLoincCoding);
-        aDRCodingList.add(aGeneNameCoding);
-        aDRCodableConcept.setCoding(aDRCodingList);
+        CodingSetup aDRCodingSetup = new CodingSetup();
+        aDRCodingSetup.addCoding("http://loinc.org", "81247-9", "Master HL7 genetic variant reporting panel");
+        aDRCodingSetup.addCoding("http://www.genenames.org/genegroup","588","Histocompatibility complex (HLA)");
+        aDRCodableConcept.setCoding(aDRCodingSetup.getMyCodingList());
         aDiagnosticReport.setCode(aDRCodableConcept);
 
+        List<CanonicalType> aList = new ArrayList<>();
+        CanonicalType aType = new CanonicalType();
+        aType.setValueAsString("http://fhir.nmdp.org/ig/hla-reporting/StructureDefinition/hla-summary-report");
+        aList.add(aType);
+        Meta aMeta = new Meta();
+        aMeta.setProfile(aList);
+        aDiagnosticReport.setMeta(aMeta);
+
+        aDiagnosticReport.setId("Versiti-"+aSampleXml.getMySampleName()+"-HLA-Report");
+
         return aDiagnosticReport;
+    }
+
+    public void createGlStringCodableConcept(LocusTARR theLocus, ExtensionSetup theExtensions)
+    {
+        String aGlString  = theLocus.getTypingResult().getGLString();
+        String aAlleleVersion = theLocus.getAlleleDB().getVersion();
+        aAlleleVersion = aAlleleVersion.substring(aAlleleVersion.indexOf("HLA ") + 4);
+        CodeableConcept aCodableConcept = new CodeableConcept();
+        CodingSetup aCodingSetup = new CodingSetup();
+        aCodingSetup.addCoding("http://glstring.org", "hla#"+aAlleleVersion+"#"+aGlString, "");
+        aCodableConcept.setCoding(aCodingSetup.getMyCodingList());
+        theExtensions.createExtension("http://fhir.nmdp.org/ig/hla-reporting/StructureDefinition/hla-genotype-summary", aCodableConcept);
     }
 }

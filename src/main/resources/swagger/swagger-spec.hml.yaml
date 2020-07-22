@@ -32,3 +32,22 @@ paths:
             type: string
         "500":
           description: ErrorException
+  /tarr/convertZip:
+    post:
+      operationId: tarr2fhirmulti
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - in: formData
+          name: upfile
+          type: file
+          description: The file to upload.
+      responses:
+        "200":
+          description: Return the json bundle
+          schema:
+            type: string
+        "500":
+          description: ErrorException
