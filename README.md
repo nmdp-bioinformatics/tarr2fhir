@@ -32,7 +32,7 @@ Two API EPs are available
 - After checking out the code, please run the following - 
    - mvn clean
    - mvn install
-- Run the application with the following command :
+- Start the application with the following command :
    - java -jar tarr2fhir-0.0.1-SNAPSHOT.jar
 - Updates for TARR.xsd schema definition file
    - For privacy reasons, the "TARR.xsd" file is not part of the code repository. 
