@@ -1,10 +1,9 @@
 package org.nmdp.fhirsubmission.hapi.models;
 
-import java.util.UUID;
+import org.hl7.fhir.r4.model.IdType;
 
 public class FhirGuid {
-
-    public static String genereateUrn() {
-        return String.format("urn:uuid:%s", UUID.randomUUID().toString());
+    public static IdType genereateUrn() {
+        return IdType.newRandomUuid();
     }
 }

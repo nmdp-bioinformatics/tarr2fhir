@@ -1,22 +1,15 @@
 package org.nmdp.fhirconversion;
 
-import org.hl7.fhir.r4.model.DiagnosticReport;
-import org.hl7.fhir.r4.model.Observation;
-import org.hl7.fhir.r4.model.Provenance;
-import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.*;
 import org.modelmapper.ModelMapper;
 import org.nmdp.fhirsubmission.hapi.models.BundleResource;
+import org.nmdp.fhirsubmission.hapi.models.MolecularSequences;
 import org.nmdp.fhirsubmission.hapi.models.NarrativeText;
 import org.nmdp.fhirsubmission.hapi.models.Observations;
-import org.nmdp.mapping.DiagnosticReportMap;
-import org.nmdp.mapping.ObservationMap;
-import org.nmdp.mapping.PatientMap;
-import org.nmdp.mapping.SpecimenMap;
+import org.nmdp.mapping.*;
 import org.nmdp.tarrbean.SampleBean;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FhirGenerator
@@ -27,6 +20,12 @@ public class FhirGenerator
         myBundleResource = new BundleResource();
         ModelMapper mapper = createMapper();
 
+        List<MolecularSequence> sequences = new ArrayList<>();
+        List<MolecularSequences> theSequences = aProjXml.getMyListLocusTarr().stream()
+                .filter(Objects::nonNull)
+                .map(aLocusTarr -> mapper.map(aLocusTarr, MolecularSequences.class))
+                .collect(Collectors.toList());
+
         List<Observation> observations = new ArrayList<>();
         List<Observations> theObservations =
         aProjXml.getMyListLocusTarr().stream()
@@ -34,58 +33,96 @@ public class FhirGenerator
                 .map(aLocusTarr -> mapper.map(aLocusTarr, Observations.class))
                 .collect(Collectors.toList());
 
+        Map<String, String> aMap = new HashMap<>();
+        theSequences.stream().filter(Objects::nonNull).forEach(theSeq -> makeSequences(theSeq, sequences));
+        sequences.stream().filter(Objects::nonNull).
+                forEach(seq -> addtoMap(seq, aMap));
+
         theObservations.stream().filter(Objects::nonNull).forEach(aObs -> makeObservation(aObs, observations, aProjXml.getMySampleName()));
+//        observations.stream().filter(Objects::nonNull).forEach(obs->updateObsIds(obs, aProjXml.getMySampleName()));
+        observations.stream().filter(Objects::nonNull).
+                filter(obs-> obs.getText().getDiv().getValue().contains("Allele")).forEach(obs->updateReferences(obs, aMap));
+//        observations.stream().filter(Objects::nonNull).forEach(obs-> update);
         DiagnosticReport diagnosticReport = mapper.map(aProjXml, DiagnosticReport.class);
-        diagnosticReport.setText((new NarrativeText()).getNarrative("HLA genotyping report for sample name = "+aProjXml.getMySampleName()));
+        diagnosticReport.setText((new NarrativeText()).getNarrative("HLA genotyping report for sample name = " + aProjXml.getMySampleName()));
         List<Reference> theDiagReportReferences = new ArrayList<>();
         observations.stream().filter(Objects::nonNull).filter(aObs -> aObs.getId().contains("Genotype")).
                 forEach(obs -> getGenotypeReferences(theDiagReportReferences, obs.getId()));
         diagnosticReport.setResult(theDiagReportReferences);
-        myBundleResource.addDiagnosticReport(diagnosticReport);
+
+        myBundleResource.addSequences(sequences);
         myBundleResource.addObservations(observations);
+        myBundleResource.addDiagnosticReport(diagnosticReport);
+
+        Device aDevice = new Device();
+        Device.DeviceDeviceNameComponent aDeviceName = new Device.DeviceDeviceNameComponent();
+        List<Device.DeviceDeviceNameComponent> aDNameList = new ArrayList<>();
+        aDeviceName.setName("Tarr2Fhir");
+        aDeviceName.setType(Device.DeviceNameType.MODELNAME);
+        aDNameList.add(aDeviceName);
+        aDevice.setDeviceName(aDNameList);
+        myBundleResource.addDevice(aDevice);
+
 
         Provenance aProvenance = new Provenance();
-        aProvenance.addTarget(new Reference().setReference("DiagnosticReport/" + diagnosticReport.getId()));
+        aProvenance.addTarget(new Reference(diagnosticReport.getIdElement().getValue()));
         observations.stream().filter(Objects::nonNull)
-                .forEach(obs -> aProvenance.addTarget(new Reference().setReference("Observation/" + obs.getId())));
+                .forEach(obs -> aProvenance.addTarget(new Reference(obs.getIdElement().getValue())));
+        aProvenance.addTarget(new Reference(aDevice.getIdElement().getValue()));
+        sequences.stream().filter(Objects::nonNull)
+                .forEach(seq -> aProvenance.addTarget(new Reference(seq.getIdElement().getValue())));
         myBundleResource.addProvenance(aProvenance);
+
+
+    }
+
+    private void addtoMap(MolecularSequence theSeq, Map<String, String> theMap)
+    {
+        String aGlString = theSeq.getReferenceSeq().getReferenceSeqId().getText();
+//        if (theMap.get(aGlString) != null)
+//        {
+            theMap.put(aGlString, theSeq.getIdElement().getValue());
+//        }
+    }
+
+    private void makeSequences(MolecularSequences theSeqss, List<MolecularSequence> theSeqs)
+    {
+        theSeqss.getMyMolecularSequences().stream().filter(Objects::nonNull).forEach(seq -> theSeqs.add(seq));
     }
 
     private void getGenotypeReferences(List<Reference> theReference, String theReferenceId)
     {
         Reference aRef = new Reference();
-        aRef.setReference("Observation/" + theReferenceId);
+        aRef.setReference(theReferenceId);
         theReference.add(aRef);
     }
 
     public void makeObservation(Observations theObss, List<Observation> theObs, String theName)
     {
        theObss.getMyObservations().stream().filter(Objects::nonNull).forEach(obs -> theObs.add(obs));
-       theObs.stream().filter(Objects::nonNull).forEach(obs->updateObsIds(obs, theName));
-       theObs.stream().filter(Objects::nonNull).forEach(obs->updateReferences(obs, theName));
     }
 
-    public void updateReferences(Observation obs, String theName)
+    public void updateReferences(Observation obs, Map<String, String> theMap)
     {
        List<Reference> aReferences = obs.getDerivedFrom();
-       aReferences.stream().filter(Objects::nonNull).forEach(aRef -> renameReference(theName, aRef));
+       String aGlString = obs.getValueCodeableConcept().getCoding().get(0).getCode().substring(11);
+       if (obs.getValueCodeableConcept().getCoding().get(0).getCode().contains(aGlString))
+           aReferences.add(new Reference(theMap.get(aGlString)));
+//       aReferences.stream().filter(Objects::nonNull).forEach(aRef -> renameReference(theMap.get(aGlString), aRef));
     }
 
-    public void renameReference(String theName, Reference theReference)
-    {
-        String aRefString = theReference.getReference();
-        int aIndex = aRefString.indexOf("tarr") + 4;
-        aRefString = aRefString.substring(0, aIndex) + theName+ aRefString.substring(aIndex);
-        theReference.setReference(aRefString);
-    }
+//    public void renameReference(String theUUid, Reference theReference)
+//    {
+//       theReference.setReference(theUUid);
+//    }
 
-    private void updateObsIds(Observation obs, String theName)
-    {
-        String aId = obs.getId();
-        int aIndex = aId.indexOf("tarr") + 4;
-        aId = aId.substring(0, aIndex) + theName+ aId.substring(aIndex);
-        obs.setId(aId);
-    }
+//    private void updateObsIds(Observation obs, String theName)
+//    {
+//        String aId = obs.getId();
+//        int aIndex = aId.indexOf("tarr") + 4;
+//        aId = aId.substring(0, aIndex) + theName+ aId.substring(aIndex);
+//        obs.setId(aId);
+//    }
 
     public BundleResource getMyBundleResource() {
         return myBundleResource;
@@ -98,6 +135,7 @@ public class FhirGenerator
         aMapper.addConverter(new SpecimenMap());
         aMapper.addConverter(new DiagnosticReportMap());
         aMapper.addConverter(new ObservationMap());
+        aMapper.addConverter(new MolecularSequenceMap());
         return aMapper;
     }
 }

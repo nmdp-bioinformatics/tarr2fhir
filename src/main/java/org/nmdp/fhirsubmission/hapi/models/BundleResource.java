@@ -24,8 +24,10 @@ public class BundleResource
 
     public void addDiagnosticReport(DiagnosticReport theDiagReport)
     {
+        String theFullUrl = theDiagReport.getIdElement().getValue();
+        theDiagReport.getIdElement().setValue(null);
         myFhirBundle.addEntry()
-                .setFullUrl(theDiagReport.getIdElement().getValue())
+                .setFullUrl(theFullUrl)
                 .setResource(theDiagReport)
                 .getRequest()
                 .setUrl("DiagnosticReport")
@@ -34,40 +36,79 @@ public class BundleResource
 
     public void addObservations(List<Observation> theObservations)
     {
-        theObservations.stream().filter(Objects::nonNull).forEach(aObs ->  myFhirBundle.addEntry()
-                .setFullUrl(aObs.getIdElement().getValue())
+        theObservations.stream().filter(Objects::nonNull).forEach(aObs ->  addObstoBundle(aObs));
+    }
+
+    public void addObstoBundle(Observation aObs)
+    {
+        String theFullUrl = aObs.getIdElement().getValue();
+        aObs.getIdElement().setValue(null);
+        myFhirBundle.addEntry()
+                .setFullUrl(theFullUrl)
                 .setResource(aObs)
                 .getRequest()
                 .setUrl("Observation")
-                .setMethod(Bundle.HTTPVerb.POST));
+                .setMethod(Bundle.HTTPVerb.POST);
     }
-    public void addPatient(Patient thePatient)
+    public void addSequences(List<MolecularSequence> theSequences)
     {
-        myFhirBundle.addEntry()
-            .setFullUrl(thePatient.getIdElement().getValue())
-            .setResource(thePatient)
-            .getRequest()
-            .setUrl("Patient")
-            .setMethod(Bundle.HTTPVerb.POST);
+        theSequences.stream().filter(Objects::nonNull).forEach(aSeq ->  addSeqtoBundle(aSeq));
     }
 
-    public void addSpecimen(Specimen theSpecimen)
+    public void addSeqtoBundle(MolecularSequence theSeq)
     {
+        String theFullUrl = theSeq.getIdElement().getValue();
+        theSeq.getIdElement().setValue(null);
         myFhirBundle.addEntry()
-                .setFullUrl(theSpecimen.getIdElement().getValue())
-                .setResource(theSpecimen)
+                .setFullUrl(theFullUrl)
+                .setResource(theSeq)
                 .getRequest()
-                .setUrl("Specimen")
+                .setUrl("MolecularSequence")
                 .setMethod(Bundle.HTTPVerb.POST);
     }
 
+//    public void addPatient(Patient thePatient)
+//    {
+//        myFhirBundle.addEntry()
+//            .setFullUrl(thePatient.getIdElement().getValue())
+//            .setResource(thePatient)
+//            .getRequest()
+//            .setUrl("Patient")
+//            .setMethod(Bundle.HTTPVerb.POST);
+//    }
+//
+//    public void addSpecimen(Specimen theSpecimen)
+//    {
+//        myFhirBundle.addEntry()
+//                .setFullUrl(theSpecimen.getIdElement().getValue())
+//                .setResource(theSpecimen)
+//                .getRequest()
+//                .setUrl("Specimen")
+//                .setMethod(Bundle.HTTPVerb.POST);
+//    }
+
     public void addProvenance(Provenance theProvenance)
     {
+        String theFullUrl = theProvenance.getIdElement().getValue();
+        theProvenance.getIdElement().setValue(null);
         myFhirBundle.addEntry()
-                .setFullUrl(theProvenance.getIdElement().getValue())
+                .setFullUrl(theFullUrl)
                 .setResource(theProvenance)
                 .getRequest()
                 .setUrl("Provenance")
+                .setMethod(Bundle.HTTPVerb.POST);
+
+    }
+
+    public void addDevice(Device theDevice)
+    {
+        String theFullUrl = theDevice.getIdElement().getValue();
+        theDevice.getIdElement().setValue(null);
+        myFhirBundle.addEntry()
+                .setFullUrl(theFullUrl)
+                .setResource(theDevice)
+                .getRequest()
+                .setUrl("Device")
                 .setMethod(Bundle.HTTPVerb.POST);
 
     }
