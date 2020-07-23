@@ -6,3 +6,4 @@
 /target/
 
 tarr2fhir.iml
+/src/main/resources/schemas/TARR.xsd
