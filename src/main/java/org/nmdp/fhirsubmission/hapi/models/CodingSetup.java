@@ -30,4 +30,14 @@ public class CodingSetup {
         aCoding.setDisplay(theDisplay);
         myCodingList.add(aCoding);
     }
+
+    public void addCoding(String theSystem, String theCode, String theVersion, String theDisplay)
+    {
+        Coding aCoding = new Coding();
+        aCoding.setSystem(theSystem);
+        aCoding.setVersion(theVersion);
+        aCoding.setCode(theCode);
+        aCoding.setDisplay(theDisplay);
+        myCodingList.add(aCoding);
+    }
 }

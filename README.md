@@ -34,6 +34,7 @@ Two API EPs are available
    - mvn install
 - Start the application with the following command :
    - java -jar tarr2fhir-0.0.1-SNAPSHOT.jar
+   - The jar file will be inside the target folder in the code
 - Updates for TARR.xsd schema definition file
    - For privacy reasons, the "TARR.xsd" file is not part of the code repository. 
    - This file needs to be downloaded from - https://www.gendx.com/NGSengine/XSD/20190613/TARR.xsd
@@ -43,7 +44,7 @@ Two API EPs are available
 
 ### Testing
 - With the application launched locally, the APIs will be available at
-  - http://localhost:8099
+  - http://localhost:8090
     - for /tarr/convert2Fhir
       - POST a single gendx format "xml" to this using POSTman or curl
       - Use the following headers: 
@@ -65,12 +66,14 @@ Two API EPs are available
          - DiagnosticReport
          - Observation (both Allele and Genotype)
          - Provenance
+         - Device
+         - MolecularSequence
     - if there are errors, standard error messages will be received 
 - The API health can be tested by calling one of the two actuator end-points that are enabled as part of spring-boot application setup
-  - http://localhost:8099/actuator/health
-  - http://localhost:8099/actuator/info    
+  - http://localhost:8090/actuator/health
+  - http://localhost:8090/actuator/info    
 - The Swagger-Api documentation page can be found at 
-  - http://localhost:8099/v2/api-docs 
+  - http://localhost:8090/v2/api-docs 
 
 ### TODO
 1. The Resources generated only include the following:
@@ -78,14 +81,13 @@ Two API EPs are available
    - Bundle
    - Observation (both allele and genotype)
    - Provenance
+   - MolecularSequence
+   - Device
    - #### _Tasks_
-        - [ ] Device
         - [ ] Organization
-        - [ ] MolecularSequence
 
 2. Update DiagnosticReport and Observation resources with "specimen" reference
-   - using an "Extension" that contains - "http://terminology.cibmtr.org/identifier/tarr-sample-name"
-   - This is because we are not creating a "Patient" or "Specimen" resource
+   - using a "reference" to an "identifier" that contains - "http://terminology.cibmtr.org/identifier/tarr-sample-name"
 
 3. Make the API customizable by providing input "parameters" to specify meta-data options
 

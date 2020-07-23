@@ -7,13 +7,12 @@ import java.util.List;
 
 public class Observations {
 
+    private List<Observation> myObservations = new ArrayList<>();
+
     public List<Observation> getMyObservations() {
         return myObservations;
     }
-
     public void setMyObservations(List<Observation> myObservations) {
         this.myObservations = myObservations;
     }
-
-    private List<Observation> myObservations = new ArrayList<>();
 }

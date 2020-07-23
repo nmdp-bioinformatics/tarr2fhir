@@ -8,6 +8,7 @@ import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;
 import org.nmdp.fhirsubmission.hapi.models.CodingSetup;
 import org.nmdp.fhirsubmission.hapi.models.ExtensionSetup;
+import org.nmdp.fhirsubmission.hapi.models.FhirGuid;
 import org.nmdp.gendxdatamodels.LocusTARR;
 import org.nmdp.tarrbean.SampleBean;
 
@@ -43,14 +44,16 @@ public class DiagnosticReportMap implements Converter<SampleBean, DiagnosticRepo
         aMeta.setProfile(aList);
         aDiagnosticReport.setMeta(aMeta);
 
-        aDiagnosticReport.setId("Versiti-"+aSampleXml.getMySampleName()+"-HLA-Report");
-
+        aDiagnosticReport.setId(FhirGuid.genereateUrn());
         return aDiagnosticReport;
     }
 
     public void createGlStringCodableConcept(LocusTARR theLocus, ExtensionSetup theExtensions)
     {
         String aGlString  = theLocus.getTypingResult().getGLString();
+        String aLocusName = theLocus.getName();
+        String aGlStringLocusName = aLocusName.substring(aLocusName.indexOf("-")+1);
+        aGlString = aGlString.replaceAll(aGlStringLocusName, aLocusName);
         String aAlleleVersion = theLocus.getAlleleDB().getVersion();
         aAlleleVersion = aAlleleVersion.substring(aAlleleVersion.indexOf("HLA ") + 4);
         CodeableConcept aCodableConcept = new CodeableConcept();
