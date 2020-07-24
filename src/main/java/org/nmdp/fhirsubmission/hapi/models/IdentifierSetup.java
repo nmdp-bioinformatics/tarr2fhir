@@ -28,7 +28,7 @@ public class IdentifierSetup
 
         CodeableConcept aCodableConcept = new CodeableConcept();
         Coding aCoding = new Coding();
-        aCoding.setSystem("http://cibmtr.org/codesystem/subject-type");
+        aCoding.setSystem("http://terminology.cibmtr.org/codesystem/subject-type");
         aCoding.setCode(thePatientType);
         List<Coding> aCodingList = new ArrayList<>();
         aCodingList.add(aCoding);
