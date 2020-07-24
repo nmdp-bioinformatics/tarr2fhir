@@ -118,9 +118,30 @@ public class ObservationMap implements Converter<LocusTARR, Observations>
         CodingSetup aCodingSetup = new CodingSetup();
         aCodingSetup.addCoding("http://terminology.hl7.org/CodeSystem/observation-category", "laboratory", "");
         aCategoryCC.setCoding(aCodingSetup.getMyCodingList());
+        aCategoryCCList.add(aCategoryCC);
         theObs.setCategory(aCategoryCCList);
 
         theObs.setText(NarrativeText.getNarrative(theType + " Observation for " +theLocus));
+
+        List<Observation.ObservationComponentComponent> aCompList = new ArrayList<>();
+        Observation.ObservationComponentComponent aComp = new Observation.ObservationComponentComponent();
+
+        CodeableConcept aHGNCCC = new CodeableConcept();
+        CodingSetup aHgncCode = new CodingSetup();
+        aHgncCode.addCoding("http://www.genenames.org/geneId", getHGNCCode(theLocus), theLocus);
+        aHGNCCC.setCoding(aHgncCode.getMyCodingList());
+        aComp.setValue(aHGNCCC);
+
+        Observation.ObservationComponentComponent aComp2 = new Observation.ObservationComponentComponent();
+        CodingSetup aLoincCode = new CodingSetup();
+        aLoincCode.addCoding("\"http://loinc.org", getLoinc(theLocus), "");
+        CodeableConcept aLoincCC = new CodeableConcept();
+        aLoincCC.setCoding(aLoincCode.getMyCodingList());
+        aComp2.setCode(aLoincCC);
+
+        aCompList.add(aComp);
+        aCompList.add(aComp2);
+        theObs.setComponent(aCompList);
     }
 
     private CodeableConcept createGlStringCodeableConcept(String theGlString, String theLocus, String theVersion)
@@ -133,5 +154,65 @@ public class ObservationMap implements Converter<LocusTARR, Observations>
         aValueCodingCC.addCoding("http://glstring.org", "hla#" + theVersion + "#" + theGlString, "") ;
         aGlStringCC.setCoding(aValueCodingCC.getMyCodingList());
         return aGlStringCC;
+    }
+
+    private String getLoinc(String theLocusName)
+    {
+        switch(theLocusName)
+        {
+            case "HLA-A":
+                return "57290-9";
+            case "HLA-B":
+                return "57291-7";
+            case "HLA-C":
+                return "77636-9";
+            case "HLA-DPB1":
+                return "59017-4";
+            case "HLA-DQB1":
+                return "57299-0";
+            case "HLA-DRB1":
+                return "57293-3";
+            case "HLA-DRB3":
+                return "57294-1";
+            case "HLA-DRB4":
+                return "57295-8";
+            case "HLA-DRB5":
+                return "57296-6";
+            case "HLA-DPA1":
+                return "59018-2";
+            case "HLA-DQA1":
+                return "59019-0";
+        }
+        return "";
+    }
+
+    private String getHGNCCode(String thelocusName)
+    {
+        switch (thelocusName)
+        {
+            case "HLA-A":
+                return "HGNC:4931";
+            case "HLA-B":
+                return "HGNC:4932";
+            case "HLA-C":
+                return "HGNC:4933";
+            case "HLA-DRB1":
+                return "HGNC:4948";
+            case "HLA-DQB1":
+                return "HGNC:4944";
+            case "HLA-DPB1":
+                return "HGNC:4940";
+            case "HLA-DPA1":
+                return "HGNC:4938";
+            case "HLA-DQA1":
+                return "HGNC:4942";
+            case "HLA-DRB3":
+                return "HGNC:4951";
+            case "HLA-DRB4":
+                return "HGNC:4952";
+            case "HLA-DRB5":
+                return "HGNC:4953";
+        }
+        return null;
     }
 }
