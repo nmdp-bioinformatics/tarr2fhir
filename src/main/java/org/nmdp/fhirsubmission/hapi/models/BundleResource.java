@@ -22,50 +22,62 @@ public class BundleResource
         this.myFhirBundle.setType(Bundle.BundleType.TRANSACTION);
     }
 
-    public void addDiagnosticReport(DiagnosticReport theDiagReport)
+    public void addResource(DomainResource theResource)
     {
-        String theFullUrl = theDiagReport.getIdElement().getValue();
-        theDiagReport.getIdElement().setValue(null);
+        String theFullUrl = theResource.getIdElement().getValue();
+        theResource.getIdElement().setValue(null);
         myFhirBundle.addEntry()
                 .setFullUrl(theFullUrl)
-                .setResource(theDiagReport)
+                .setResource(theResource)
                 .getRequest()
-                .setUrl("DiagnosticReport")
+                .setUrl(theResource.getResourceType().toString())
                 .setMethod(Bundle.HTTPVerb.POST);
     }
+
+//    public void addDiagnosticReport(DiagnosticReport theDiagReport)
+//    {
+//        String theFullUrl = theDiagReport.getIdElement().getValue();
+//        theDiagReport.getIdElement().setValue(null);
+//        myFhirBundle.addEntry()
+//                .setFullUrl(theFullUrl)
+//                .setResource(theDiagReport)
+//                .getRequest()
+//                .setUrl("DiagnosticReport")
+//                .setMethod(Bundle.HTTPVerb.POST);
+//    }
 
     public void addObservations(List<Observation> theObservations)
     {
-        theObservations.stream().filter(Objects::nonNull).forEach(aObs ->  addObstoBundle(aObs));
+        theObservations.stream().filter(Objects::nonNull).forEach(aObs ->  addResource(aObs));
     }
 
-    public void addObstoBundle(Observation aObs)
-    {
-        String theFullUrl = aObs.getIdElement().getValue();
-        aObs.getIdElement().setValue(null);
-        myFhirBundle.addEntry()
-                .setFullUrl(theFullUrl)
-                .setResource(aObs)
-                .getRequest()
-                .setUrl("Observation")
-                .setMethod(Bundle.HTTPVerb.POST);
-    }
+//    public void addObstoBundle(Observation aObs)
+//    {
+//        String theFullUrl = aObs.getIdElement().getValue();
+//        aObs.getIdElement().setValue(null);
+//        myFhirBundle.addEntry()
+//                .setFullUrl(theFullUrl)
+//                .setResource(aObs)
+//                .getRequest()
+//                .setUrl("Observation")
+//                .setMethod(Bundle.HTTPVerb.POST);
+//    }
     public void addSequences(List<MolecularSequence> theSequences)
     {
-        theSequences.stream().filter(Objects::nonNull).forEach(aSeq ->  addSeqtoBundle(aSeq));
+        theSequences.stream().filter(Objects::nonNull).forEach(aSeq ->  addResource(aSeq));
     }
 
-    public void addSeqtoBundle(MolecularSequence theSeq)
-    {
-        String theFullUrl = theSeq.getIdElement().getValue();
-        theSeq.getIdElement().setValue(null);
-        myFhirBundle.addEntry()
-                .setFullUrl(theFullUrl)
-                .setResource(theSeq)
-                .getRequest()
-                .setUrl("MolecularSequence")
-                .setMethod(Bundle.HTTPVerb.POST);
-    }
+//    public void addSeqtoBundle(MolecularSequence theSeq)
+//    {
+//        String theFullUrl = theSeq.getIdElement().getValue();
+//        theSeq.getIdElement().setValue(null);
+//        myFhirBundle.addEntry()
+//                .setFullUrl(theFullUrl)
+//                .setResource(theSeq)
+//                .getRequest()
+//                .setUrl("MolecularSequence")
+//                .setMethod(Bundle.HTTPVerb.POST);
+//    }
 
 //    public void addPatient(Patient thePatient)
 //    {
@@ -87,18 +99,18 @@ public class BundleResource
 //                .setMethod(Bundle.HTTPVerb.POST);
 //    }
 
-    public void addProvenance(Provenance theProvenance)
-    {
-        String theFullUrl = theProvenance.getIdElement().getValue();
-        theProvenance.getIdElement().setValue(null);
-        myFhirBundle.addEntry()
-                .setFullUrl(theFullUrl)
-                .setResource(theProvenance)
-                .getRequest()
-                .setUrl("Provenance")
-                .setMethod(Bundle.HTTPVerb.POST);
-
-    }
+//    public void addProvenance(Provenance theProvenance)
+//    {
+//        String theFullUrl = theProvenance.getIdElement().getValue();
+//        theProvenance.getIdElement().setValue(null);
+//        myFhirBundle.addEntry()
+//                .setFullUrl(theFullUrl)
+//                .setResource(theProvenance)
+//                .getRequest()
+//                .setUrl("Provenance")
+//                .setMethod(Bundle.HTTPVerb.POST);
+//
+//    }
 
     public void addDevice(Device theDevice)
     {
