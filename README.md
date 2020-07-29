@@ -23,12 +23,15 @@ Two API EPs are available
 
 
 ### DevOps 
-- The code can be checked out from the "master" branch of the "nmdp-bioinformatics/tarr2fhir" page. 
+- The code can be checked out from the "master" branch of the "nmdp-bioinformatics/tarr2fhir" page.
    - If the intent is to add your own code, then kindly fork this repo and create your changes in your forked repo
-   - Generate PR when ready and merge to main repository
-- The above step will be possible when the commits are merged upstream. Until then, please checkout "jiyer-nmdp/tarr2fhir":
-   - master branch will have release ready code before merging upstream
-   - develop branch will contain latest development updates   
+   - Generate Pull Request when ready and merge to main repository
+- Code repository details:
+   - main repo nmdp-bioinformatics/tarr2fhir has the latest published code
+        - master branch will have release ready code
+   - forked repo jiyer-nmdp/tarr2fhir is being used for active development
+        - master branch will be updated before merging upstream
+        - develop branch will contain latest development updates   
 - After checking out the code, please run the following - 
    - mvn clean
    - mvn install
@@ -76,7 +79,7 @@ Two API EPs are available
   - http://localhost:8090/v2/api-docs 
 
 ### TODO
-1. The Resources generated only include the following:
+1. The Resources generated include the following:
    - DiagnosticReport
    - Bundle
    - Observation (both allele and genotype)
@@ -84,11 +87,17 @@ Two API EPs are available
    - MolecularSequence
    - Device
    - #### _Tasks_
+      Resources to be generated in future
         - [ ] Organization
 
-2. Update DiagnosticReport and Observation resources with "specimen" reference
-   - using a "reference" to an "identifier" that contains - "http://terminology.cibmtr.org/identifier/tarr-sample-name"
+2. Make the API customizable by providing input "parameters" to specify meta-data options
 
-3. Make the API customizable by providing input "parameters" to specify meta-data options
+3. Add test classes
 
-4. Other items as identified
+4. Add more Java Docs
+
+5. Other items as identified
+
+
+###Notes
+Please refer to existing Pull Requests that have been merged and the changelist descriptions for details of code updates made
