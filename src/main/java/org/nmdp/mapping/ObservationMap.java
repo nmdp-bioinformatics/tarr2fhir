@@ -67,6 +67,8 @@ public class ObservationMap implements Converter<LocusTARR, Observations>
         aCodeCCList.add(aCodeCC);
         aAlleleObservation.setCode(aCodeCC);
         aAlleleObservation.setValue(createGlStringCodeableConcept(theGlString, theLocus, theVersion));
+
+        aAlleleObservation.setText(NarrativeText.getNarrative("Allele Observation for " +theGlString));
         return aAlleleObservation;
     }
 
@@ -79,6 +81,7 @@ public class ObservationMap implements Converter<LocusTARR, Observations>
         List<CodeableConcept> aCodeCCList = new ArrayList<>();
         CodingSetup aCodingCC = new CodingSetup();
         aCodingCC.addCoding("http://loinc.org", "84413-4", "Genotype display name") ;
+        aCodingCC.addCoding("http://loinc.org", getLoincGeneric(theLocus), theLocus + " [Type]");
         aCodeCC.setCoding(aCodingCC.getMyCodingList());
         aCodeCCList.add(aCodeCC);
 
@@ -91,6 +94,8 @@ public class ObservationMap implements Converter<LocusTARR, Observations>
         aGenotypeObsReferences.add(aRef1);
         aGenotypeObsReferences.add(aRef2);
         aGenotypeObservation.setDerivedFrom(aGenotypeObsReferences);
+
+        aGenotypeObservation.setText(NarrativeText.getNarrative("Genotype Observation for " +theLocus));
 
         return aGenotypeObservation;
     }
@@ -121,8 +126,6 @@ public class ObservationMap implements Converter<LocusTARR, Observations>
         aCategoryCCList.add(aCategoryCC);
         theObs.setCategory(aCategoryCCList);
 
-        theObs.setText(NarrativeText.getNarrative(theType + " Observation for " +theLocus));
-
         List<Observation.ObservationComponentComponent> aCompList = new ArrayList<>();
         Observation.ObservationComponentComponent aComp = new Observation.ObservationComponentComponent();
 
@@ -134,7 +137,7 @@ public class ObservationMap implements Converter<LocusTARR, Observations>
 
         Observation.ObservationComponentComponent aComp2 = new Observation.ObservationComponentComponent();
         CodingSetup aLoincCode = new CodingSetup();
-        aLoincCode.addCoding("\"http://loinc.org", getLoinc(theLocus), "");
+        aLoincCode.addCoding("http://loinc.org", "48018-6", "Gene studied [ID]");
         CodeableConcept aLoincCC = new CodeableConcept();
         aLoincCC.setCoding(aLoincCode.getMyCodingList());
         aComp2.setCode(aLoincCC);
@@ -156,32 +159,32 @@ public class ObservationMap implements Converter<LocusTARR, Observations>
         return aGlStringCC;
     }
 
-    private String getLoinc(String theLocusName)
+    private String getLoincGeneric(String theLocusName)
     {
         switch(theLocusName)
         {
             case "HLA-A":
-                return "57290-9";
+                return "13298-5";
             case "HLA-B":
-                return "57291-7";
+                return "13299-3";
             case "HLA-C":
-                return "77636-9";
+                return "13302-5";
             case "HLA-DPB1":
                 return "59017-4";
             case "HLA-DQB1":
-                return "57299-0";
+                return "53938-7";
             case "HLA-DRB1":
-                return "57293-3";
+                return "57298-2";
             case "HLA-DRB3":
-                return "57294-1";
+                return "59022-4";
             case "HLA-DRB4":
-                return "57295-8";
+                return "59021-6";
             case "HLA-DRB5":
-                return "57296-6";
+                return "59020-8";
             case "HLA-DPA1":
                 return "59018-2";
             case "HLA-DQA1":
-                return "59019-0";
+                return "94495-9";
         }
         return "";
     }
