@@ -39,7 +39,7 @@ Two API EPs are available
    - java -jar tarr2fhir-0.0.1-SNAPSHOT.jar
    - The jar file will be inside the target folder in the code
 - Updates for TARR.xsd schema definition file
-   - For privacy reasons, the "TARR.xsd" file is not part of the code repository. 
+   - The "TARR.xsd" file is not part of the code repository. 
    - This file needs to be downloaded from - https://www.gendx.com/NGSengine/XSD/20190613/TARR.xsd
    - After downloading the file, please put it in the "src/main/resources/schemas/" folder next to "bindings.xjb".
    - Do this before "mvn install" step listed above
