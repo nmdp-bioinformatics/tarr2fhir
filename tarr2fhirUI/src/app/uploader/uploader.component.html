@@ -1,0 +1,25 @@
+<p>Upload file</p>
+<div>
+  <form [formGroup] = "uploadForm" (ngSubmit)="onSubmit()">
+    <div>
+      <input type="file" name="upfile" (change)="onFileSelect($event)" />
+    </div>
+    <div>
+      <button type="submit">Upload</button>
+    </div>
+    <div>
+    <input type="radio" value="zipFile" formControlName="fileType" > Zip file
+    <input type="radio" value="xmlFile" formControlName="fileType" > Xml file
+    </div>
+    <div *ngIf="uploadForm.get('fileType').invalid" [ngClass] = "'error'">
+      Choice required
+    </div>
+
+    <div *ngIf="isButtonVisible">
+      <!--class="highlight-card-response">-->
+      <p>Download Response</p>
+      <button (click)="displayAll()"> Download </button>
+    </div>
+  </form>
+</div>
+
