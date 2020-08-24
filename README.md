@@ -11,16 +11,16 @@ Two API EPs are available
  1. /tarr/convert2Fhir - this EP accepts a single input Xml generated based on the Tarr.xsd (available in the src/main/resources folder). The xml file will be translated into an Hl7 Fhir bundle in R4 format.
  2. /tarr/convertZip - this EP accepts a zip file containing all the individual HLA locus files for a single sample (or subject)
  3. The Resources generated include the following:
-   - DiagnosticReport
-   - Bundle
-   - Observation (both allele and genotype)
-   - Provenance
-   - MolecularSequence
-   - Device
+     - DiagnosticReport
+     - Bundle
+     - Observation (both allele and genotype)
+     - Provenance
+     - MolecularSequence
+     - Device
    
 ##### NEW UI ADDED
-- A simple Angular based UI has been enabled for the users to upload files and translate to FHIR
-- Build and running instructions are described in the DevOps section
+ - A simple Angular based UI has been enabled for the users to upload files and translate to FHIR
+ - Build and running instructions are described in the DevOps section
 
 ### Pre-requisites
 - Java 8 or above
@@ -111,6 +111,7 @@ Two API EPs are available
 
 5. Make the Json bundle response generated in the UI better formatted
 
+6. Dockerize both the Service and the UI
 
 ###Notes
-Please refer to existing Pull Requests that have been merged and the changelist descriptions for details of code updates
+- Please refer to existing Pull Requests that have been merged and the changelist descriptions for details of code updates
