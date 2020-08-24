@@ -42,16 +42,18 @@ public class TarrInputController implements TarrApi {
     }
 
     @RequestMapping(value = "/convertZip",
-            produces = { "application/json" },
-            consumes = { "multipart/form-data" },
-            method = RequestMethod.POST)    @ResponseBody
+            produces = {"application/json"},
+            headers = "Accept=*",
+            method = RequestMethod.POST)
+    @ResponseBody
     public ResponseEntity<String> tarr2fhirmulti(@ApiParam(value = "The file to upload.") @Valid @RequestPart(value="upfile", required=false) MultipartFile upfile) {
         try {
-            if (upfile.isEmpty())
+            MultipartFile aMPF = (MultipartFile)upfile;
+            if (aMPF.isEmpty())
                 return  new ResponseEntity<>("BAD INPUT" , HttpStatus.NO_CONTENT);
 
             ParseInputFiles aParser = new ParseInputFiles();
-            ZipFile aZipFile = new ZipFile(convert(upfile));
+            ZipFile aZipFile = new ZipFile(convert(aMPF));
             aParser.unzipFile(aZipFile);
             return new ResponseEntity<>(aParser.getMyFhirBundleOutput(), HttpStatus.OK);
         }
