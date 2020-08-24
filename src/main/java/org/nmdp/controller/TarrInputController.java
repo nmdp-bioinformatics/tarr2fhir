@@ -18,7 +18,7 @@ import java.util.zip.ZipFile;
 
 @RestController
 @RequestMapping("/tarr")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin
 public class TarrInputController implements TarrApi {
 
     @RequestMapping(path = "/convert2Fhir", headers="Accept=application/xml",  consumes = MediaType.APPLICATION_XML_VALUE, produces   = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.POST)
@@ -42,11 +42,11 @@ public class TarrInputController implements TarrApi {
     }
 
     @RequestMapping(value = "/convertZip",
+            produces = {"application/json"},
             headers = "Accept=*",
             method = RequestMethod.POST)
-//    @CrossOrigin(origins = "http://localhost:4200")
     @ResponseBody
-    public ResponseEntity<String> tarr2fhirmulti(MultipartFile upfile) {
+    public ResponseEntity<String> tarr2fhirmulti(@ApiParam(value = "The file to upload.") @Valid @RequestPart(value="upfile", required=false) MultipartFile upfile) {
         try {
             MultipartFile aMPF = (MultipartFile)upfile;
             if (aMPF.isEmpty())

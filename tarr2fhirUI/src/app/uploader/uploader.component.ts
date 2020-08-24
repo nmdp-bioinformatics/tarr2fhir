@@ -80,6 +80,12 @@ export class UploaderComponent implements OnInit {
     console.log("response received - \n"+response);
     let blob = new Blob([response]);
     saveAs(blob, "tarr_fhir_bundle.json");
+    this.refreshPage();
+  }
+
+  refreshPage()
+  {
+    window.location.reload();
   }
 
   ngOnDestroy() {
