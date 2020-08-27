@@ -54,8 +54,9 @@ Two API EPs are available
    - Navigate to the 'target' folder that is generated
    - Run 'java -jar tarr2fhir-0.0.1-SNAPSHOT.jar' in the command line
 - Starting the UI component
-   - Navigate to 'tarr2fhirUI' folder
-   - Run 'ng serve' in the command line
+   - Navigate to 'tarr2fhirUI' folder in the command line
+   - Run 'npm install --save-dev @angular-devkit/build-angular' to install angular build capability
+   - Run 'ng serve'
    
 ### Testing
 - With the application launched locally, the APIs will be available at
