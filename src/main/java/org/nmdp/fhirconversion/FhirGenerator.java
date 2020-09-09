@@ -1,6 +1,24 @@
+/*
+ * Copyright (c) 2020 Be The Match operated by National Marrow Donor Program (NMDP).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for
+ * the specific language governing permissions and limitations under the License.
+ */
+
 package org.nmdp.fhirconversion;
 
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Reference;
 import org.modelmapper.ModelMapper;
 import org.nmdp.fhirsubmission.hapi.models.*;
 import org.nmdp.mapping.DiagnosticReportMap;
@@ -13,12 +31,6 @@ import java.util.Objects;
 public class FhirGenerator
 {
     private BundleResource myBundleResource;
-    private List<Observation> myObservations;
-    private DiagnosticReport myDiagnosticReport;
-    private Device myDevice;
-    private Provenance myProvenance;
-
-
 
     public void generateFhirBundle(SampleBean theSampleBean)
     {
@@ -29,26 +41,12 @@ public class FhirGenerator
         * */
         MolecularSequences aMS = new MolecularSequences();
         aMS.generateMolecularSequences(theSampleBean, aProvenanceReferences);
-        List<MolecularSequence> molecularSequences = aMS.getMyMolecularSequences();
 
         ModelMapper mapper = createMapper();
-
-//        List<Observation> observations = new ArrayList<>();
-//        List<Observations> theObservations =
-//        theSampleBean.getMyListLocusTarr().stream()
-//                .filter(Objects::nonNull)
-//                .map(aLocusTarr -> mapper.map(aLocusTarr, Observations.class))
-//                .collect(Collectors.toList());
-//
-//
-//
-//        theObservations.stream().filter(Objects::nonNull)
-//                .forEach(aObs -> makeObservation(aObs, observations, theSampleBean.getMySampleName()));
 
         Observations aObss = new Observations();
         aObss.generateObservations(theSampleBean, aMS.getMyUUidGlStringMap(), aProvenanceReferences);
         List<Observation> observations = aObss.getMyObservations();
-
         List<Reference> theDiagReportReferences = new ArrayList<>();
         observations.stream().filter(Objects::nonNull)
                 .filter(aObs -> aObs.getText().getDiv().getValue().contains("Genotype"))
@@ -64,21 +62,18 @@ public class FhirGenerator
         diagnosticReport.setSubject(new Reference().setIdentifier(aSpecimenId));
         aProvenanceReferences.add(diagnosticReport.getIdElement().getValue());
 
-
         DeviceResource aDR = new DeviceResource();
         aDR.generateDeviceResource(aProvenanceReferences);
 
         ProvenanceResource aPR = new ProvenanceResource();
         aPR.generateProvenanceResource(aProvenanceReferences);
 
-        aProvenanceReferences.add(diagnosticReport.getIdElement().getValue());
         myBundleResource.addSequences(aMS.getMyMolecularSequences());
         myBundleResource.addObservations(observations);
         myBundleResource.addResource(diagnosticReport);
         myBundleResource.addResource(aDR.getMyDevice());
         myBundleResource.addResource(aPR.getMyProvenance());
     }
-
 
     private void getGenotypeReferences(List<Reference> theReference, String theReferenceId)
     {
@@ -87,14 +82,11 @@ public class FhirGenerator
         theReference.add(aRef);
     }
 
-
-    public BundleResource getMyBundleResource()
-    {
+    public BundleResource getMyBundleResource() {
         return myBundleResource;
     }
 
-    protected ModelMapper createMapper()
-    {
+    protected ModelMapper createMapper() {
         ModelMapper aMapper = new ModelMapper();
         aMapper.addConverter(new DiagnosticReportMap());
         return aMapper;
