@@ -36,9 +36,19 @@ public class FhirGenerator
     {
         myBundleResource = new BundleResource();
         List<String> aProvenanceReferences = new ArrayList<>();
+
+        /**
+         * Generate Organization Resources from Meta-data input in UI
+         */
+        OrganizationResources aPerformerOrganization = new OrganizationResources();
+        aPerformerOrganization.generateOrganization("Lab (Performer)" , theSampleBean.getMyLabName(), aProvenanceReferences);
+
+        OrganizationResources aReportingCenterOrganization = new OrganizationResources();
+        aReportingCenterOrganization.generateOrganization("Reporting Organization " , theSampleBean.getMyReportingCenter(), aProvenanceReferences);
+
         /*
-        * Generate MolecularSequences from xml
-        * */
+         * Generate MolecularSequences from xml
+         * */
         MolecularSequences aMS = new MolecularSequences();
         aMS.generateMolecularSequences(theSampleBean, aProvenanceReferences);
 
@@ -69,6 +79,8 @@ public class FhirGenerator
         aPR.generateProvenanceResource(aProvenanceReferences);
 
         myBundleResource.addSequences(aMS.getMyMolecularSequences());
+        myBundleResource.addResource(aPerformerOrganization.getMyOrganization());
+        myBundleResource.addResource(aReportingCenterOrganization.getMyOrganization());
         myBundleResource.addObservations(observations);
         myBundleResource.addResource(diagnosticReport);
         myBundleResource.addResource(aDR.getMyDevice());

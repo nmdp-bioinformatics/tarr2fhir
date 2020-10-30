@@ -31,9 +31,32 @@ export class UploaderComponent implements OnInit {
   uploadForm: FormGroup;
   response: Response;
   private fileName;
-  isButtonVisible = false;
+  isButtonVisible: boolean =  false;
+  isFileSelected: boolean = false;
   choice: Choice;
+  box1value: string;
+  box2value: string;
+  sampletype: string;
+  box3value: string;
+  fileextension: string;
+  isNotRecipient: boolean = false;
+  crid: string;
+   // selectedType: string;
+  // box3value: string;
 
+  types = [
+    {name: 'Donor'},
+    {name: 'Recipient'},
+    {name: 'CBU'},
+    {name: 'CBUMother'},
+    {name: 'NonDonor'},
+  ];
+
+  labNames = [
+    {name: 'Versiti'},
+    // {name: 'Gendx'},
+    {name: 'Other'}
+  ];
 
   constructor(private uploaderService: UploadService, private formBuilder: FormBuilder) {
   }
@@ -45,7 +68,9 @@ export class UploaderComponent implements OnInit {
   ngOnInit() {
     this.uploadForm = this.formBuilder.group({
       upfile: [''],
-      fileType: new FormControl('')
+      fileType: new FormControl(''),
+      sampleType: new FormControl(''),
+      labName: new FormControl('')
     });
     this.uploaderService.getValue().subscribe((value) => {
       this.isButtonVisible = value;
@@ -59,14 +84,40 @@ export class UploaderComponent implements OnInit {
     this.fileName = file.name;
     console.log("Filename = " + this.fileName);
     this.choice = this.uploadForm.get('fileType').value;
+    this.sampletype = this.uploadForm.get('sampleType').value;
+    this.box1value = this.uploadForm.get('labName').value;
     this.uploaderService.upload(file, this);
   }
-
+  onOptionsSelected(value)
+  {
+    // let value = event.target.value;
+    //  this.selectedType = value;
+    // console.log(value);
+    if (value != "Recipient")
+      this.isNotRecipient = true;
+    else
+      this.isNotRecipient = false;
+  }
   onFileSelect(event) {
     if (event.target.files.length > 0) {
       const file = event.target.files[0];
       this.uploadForm.get('upfile').setValue(file);
+      this.announceFileSelected(file != null);
+      this.setFileExtension(file.type);
     }
+  }
+
+  setFileExtension(fileType : string)
+  {
+    if (fileType === "application/zip")
+      this.fileextension = "zipFile";
+    else if (fileType === "text/xml")
+      this.fileextension = "xmlFile";
+  }
+
+  announceFileSelected(isFileReady : boolean)
+  {
+    this.isFileSelected = isFileReady;
   }
 
   dataAvailable(isVisible : boolean) {
@@ -92,4 +143,8 @@ export class UploaderComponent implements OnInit {
   ngOnDestroy() {
     this.uploaderService.setValue(false );
   }
+
+  update2(value: string) { this.box2value = value; }
+  updateRelationship(value: string) { this.box3value = value; }
+  updateCRID(value: string) { this.crid = value; }
 }

@@ -42,6 +42,7 @@ public class DiagnosticReportMap implements Converter<SampleBean, DiagnosticRepo
         aDiagnosticReport.setStatus(DiagnosticReport.DiagnosticReportStatus.FINAL);
         ExtensionSetup aExtensions = new ExtensionSetup();
         aSampleXml.getMyListLocusTarr().stream().forEach(aLocus -> createGlStringCodableConcept(aLocus, aExtensions));
+        createExtensionCodeableConcept(aSampleXml.getMySampleType(), aExtensions);
         aDiagnosticReport.setExtension(aExtensions.getMyExtensions());
 
         CodeableConcept aDRCodableConcept = new CodeableConcept();
@@ -59,8 +60,18 @@ public class DiagnosticReportMap implements Converter<SampleBean, DiagnosticRepo
         aMeta.setProfile(aList);
         aDiagnosticReport.setMeta(aMeta);
 
+
         aDiagnosticReport.setId(FhirGuid.genereateUrn());
         return aDiagnosticReport;
+    }
+
+    public void createExtensionCodeableConcept(String theSampleType, ExtensionSetup theExtensions)
+    {
+        CodeableConcept aCodableConcept = new CodeableConcept();
+        CodingSetup aCodingSetup = new CodingSetup();
+        aCodingSetup.addCoding("http://terminology.cibmtr.org/codesystem/subject-type", theSampleType, "");
+        aCodableConcept.setCoding(aCodingSetup.getMyCodingList());
+        theExtensions.createExtension("http://fhir.nmdp.org/ig/hla-reporting/StructureDefinition/subject-type-extension", aCodableConcept);
     }
 
     public void createGlStringCodableConcept(LocusTARR theLocus, ExtensionSetup theExtensions)

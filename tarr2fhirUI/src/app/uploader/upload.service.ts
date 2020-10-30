@@ -14,7 +14,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({
@@ -52,11 +52,16 @@ export class UploadService {
   public upload(formData, uploaderComponent) {
     let headers = new HttpHeaders();
 
+    let box1 = uploaderComponent.box1value;
+    let box2 = uploaderComponent.box2value;
+    let type = uploaderComponent.sampletype;
     if (uploaderComponent.choice === "zipFile")
     {
       let fD = new FormData();
       fD.append('upfile', formData, formData.name);
-      fD.append('fileType', 'zip');
+      fD.append('labName', box1.name);
+      fD.append('reportingCenter', box2);
+      fD.append('sampleType', type);
    //   headers = headers.set('Content-type', 'multipart/form-data; boundary=upfile');
       headers = headers.set('Access-Control-Request-Headers', '*');
       this.httpClient.post(this.SERVER_URL_ZIP, fD, {
@@ -71,8 +76,19 @@ export class UploadService {
     }
     else if (uploaderComponent.choice === "xmlFile") {
       headers = headers.set("Content-Type", "application/xml");
+      // let fD = new FormData();
+      let httpParams = new HttpParams();
+      httpParams = httpParams.set('labName', box1.name);
+      httpParams = httpParams.set('reportingCenter', box2);
+      httpParams = httpParams.set('sampleType', type);
+      // fD.append('upfile', formData, formData.name);
+      // fD.append('labName', box1);
+      // fD.append('reportingCenter', box2);
+      // fD.append('sampleType', type);
       this.httpClient.post(this.SERVER_URL_SINGLE, formData, {
-        headers
+      // this.httpClient.post(this.SERVER_URL_SINGLE, formData, {
+        headers: headers,
+        params: httpParams
       }).subscribe((res) => {
         this.data = JSON.parse(JSON.stringify(res));
         console.log("Response received - " + JSON.stringify(res));

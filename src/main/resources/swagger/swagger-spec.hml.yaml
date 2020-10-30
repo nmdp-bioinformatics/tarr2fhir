@@ -25,6 +25,21 @@ paths:
         required: true
         schema:
           type: string
+      - in: body
+        name: labName
+        required: false
+        schema:
+          type: string
+      - in: body
+        name: reportingCenter
+        required: false
+        schema:
+          type: string
+      - in: body
+        name: sampleType
+        required: false
+        schema:
+          type: string
       responses:
         "200":
           description: Return the json bundle
@@ -46,6 +61,21 @@ paths:
           type: file
           description: The file to upload.
           x-mimetype: application/zip
+        - in: query
+          name: labName
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: reportingCenter
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: sampleType
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           description: Return the json bundle

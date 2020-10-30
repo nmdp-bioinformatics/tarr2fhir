@@ -98,7 +98,6 @@ public class ParseInputFiles
                 e.printStackTrace();
             }
         }
-        process();
     }
 
     public void process()
@@ -106,6 +105,13 @@ public class ParseInputFiles
         myInputFiles.stream().forEach(aXml -> processFiles(aXml));
         mySampleBean.setMyListLocusTarr(myLocusTarrList);
         setupFhir();
+    }
+
+    public void setMetaData(String theLabName, String theReportingCenter, String theSampleType)
+    {
+        mySampleBean.setMyLabName(theLabName);
+        mySampleBean.setMyReportingCenter(theReportingCenter);
+        mySampleBean.setMySampleType(theSampleType);
     }
 
 }

@@ -22,18 +22,48 @@
       <input type="file" name="upfile" (change)="onFileSelect($event)" />
     </div>
     <div>
-      <button type="submit">Upload</button>
+    <input type="radio" value="zipFile" formControlName="fileType" [ngModel]="fileextension"> Zip file
+    <input type="radio" value="xmlFile" formControlName="fileType" [ngModel]="fileextension"> Xml file
     </div>
-    <div>
-    <input type="radio" value="zipFile" formControlName="fileType" > Zip file
-    <input type="radio" value="xmlFile" formControlName="fileType" > Xml file
+    <div *ngIf="isFileSelected">
+      <button type="submit">Upload</button>
     </div>
     <div *ngIf="uploadForm.get('fileType').invalid" [ngClass] = "'error'">
       Choice required
     </div>
 
+    <p></p>
+    <p></p>
+
+    <select formControlName="labName">
+      <option *ngFor="let labname of labNames " [ngValue]="labname">
+        {{ labname.name }}
+      </option>
+    </select> Lab (Performer)
+    <p></p>
+    <select #mySelect formControlName="sampleType"
+            (change)="onOptionsSelected(mySelect.value)">
+      <option *ngFor="let sampletype of types" [value]="sampletype.name">
+        {{ sampletype.name }}
+      </option>
+    </select> Sample Type
+    <p></p>
+
+    <div *ngIf="isNotRecipient">
+    <input  #box1
+           (keyup.enter)="updateCRID(box1.value)"
+           (blur)="updateCRID(box1.value)">CRID
+    <p></p>
+    <input  #box3
+            (keyup.enter)="updateRelationship(box3.value)"
+            (blur)="updateRelationship(box3.value)">Recipient Relationship
+    </div>
+    <p></p>
+    <input #box2
+           (keyup.enter)="update2(box2.value)"
+           (blur)="update2(box2.value)">Reporting Organization
+
     <div *ngIf="isButtonVisible">
-      <!--class="highlight-card-response">-->
       <p>Download Response</p>
       <button (click)="displayAll()"> Download </button>
     </div>

@@ -22,6 +22,34 @@ import java.util.List;
 public class SampleBean
 {
     private String mySampleName;
+    private String mySampleType;
+    private String myLabName;
+    private String myReportingCenter;
+
+    public String getMySampleType() {
+        return mySampleType;
+    }
+
+    public void setMySampleType(String mySampleType) {
+        this.mySampleType = mySampleType;
+    }
+
+    public String getMyLabName() {
+        return myLabName;
+    }
+
+    public void setMyLabName(String myLabName) {
+        this.myLabName = myLabName;
+    }
+
+    public String getMyReportingCenter() {
+        return myReportingCenter;
+    }
+
+    public void setMyReportingCenter(String myReportingCenter) {
+        this.myReportingCenter = myReportingCenter;
+    }
+
     private String myProjectName;
     private List<LocusTARR> myListLocusTarr;
 
