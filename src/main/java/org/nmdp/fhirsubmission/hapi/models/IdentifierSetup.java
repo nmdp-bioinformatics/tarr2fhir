@@ -29,11 +29,17 @@ public class IdentifierSetup
     }
     public IdentifierSetup(String theSampleId, String thePatientType, String theCenterCode)
     {
+        myIdentifiers = new ArrayList<>();
         if (thePatientType.equals("RECIPIENT"))
         {
             setCridIdentifier(theSampleId, thePatientType, theCenterCode);
         }
         setHmlSampleIdentifier(theSampleId, thePatientType, theCenterCode);
+    }
+
+    public IdentifierSetup()
+    {
+        myIdentifiers = new ArrayList<>();
     }
     public void setHmlSampleIdentifier(String theSampleId, String thePatientType, String theCenterCode)
     {
@@ -66,10 +72,10 @@ public class IdentifierSetup
 
     }
 
-    public void setOrganizationIdentifier(String theSampleId, String thePatientType, String theCenterCode)
+    public void setHmlOrganizationIdentifier(String theSampleId, String thePatientType, String theCenterCode)
     {
         Identifier aSampleIdentifier = new Identifier();
-        aSampleIdentifier.setSystem("http://nmdp.org/identifier/hml-sample");
+        aSampleIdentifier.setSystem("http://terminology.nmdp.org/identifier/hml-sample");
         aSampleIdentifier.setValue(theSampleId);
 
         CodeableConcept aCodableConcept = new CodeableConcept();
@@ -89,6 +95,32 @@ public class IdentifierSetup
         aExtensionList.add(aExtension);
 
         aSampleIdentifier.setExtension(aExtensionList);
+        myIdentifiers.add(aSampleIdentifier);
+    }
+
+    public void setOrganizationIdentifier(String theType, String theValue)
+    {
+        Identifier aSampleIdentifier = new Identifier();
+        aSampleIdentifier.setSystem("http://terminology.nmdp.org/identifier/"+theType);
+        aSampleIdentifier.setValue(theValue);
+
+//        CodeableConcept aCodableConcept = new CodeableConcept();
+//        Coding aCoding = new Coding();
+//        aCoding.setSystem("http://terminology.cibmtr.org/codesystem/subject-type");
+//        aCoding.setCode(thePatientType);
+//        List<Coding> aCodingList = new ArrayList<>();
+//        aCodingList.add(aCoding);
+//        aCodableConcept.setCoding(aCodingList);
+//        aSampleIdentifier.setType(aCodableConcept);
+//
+//        Extension aExtension = new Extension();
+//        List<Extension> aExtensionList = new ArrayList<>();
+//        aExtension.setUrl("http://hl7.org/fhir/StructureDefinition/rendered-value");
+//        aExtension.addChild("valueString");
+//        aExtension.setValue(new StringType(String.format("< sample id=%s center-code=%s >", theSampleId, theCenterCode)));
+//        aExtensionList.add(aExtension);
+//
+//        aSampleIdentifier.setExtension(aExtensionList);
         myIdentifiers.add(aSampleIdentifier);
     }
 }

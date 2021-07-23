@@ -38,12 +38,13 @@ public class TarrInputController implements TarrApi {
 
     @RequestMapping(path = "/convert2Fhir", headers="Accept=application/xml",  consumes = MediaType.APPLICATION_XML_VALUE, produces   = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> tarr2fhir(@ApiParam(value = "" ,required=true )  @Valid @RequestBody String xml) {
+    public ResponseEntity<String> tarr2fhir(@ApiParam(value = "" ,required=true )  @Valid @RequestBody String xml, @RequestParam String labName, @RequestParam String reportingCenter, @RequestParam String sampleType, @RequestParam String crid, @RequestParam String relationship) {
       try {
           ParseInputFiles aParser = new ParseInputFiles();
           List<String> aXmlInput = new ArrayList<>();
           aXmlInput.add(xml);
           aParser.setMyInputFiles(aXmlInput);
+          aParser.setMetaData(labName, reportingCenter, sampleType, crid, relationship);
           aParser.process();
           if (aParser.getMyFhirBundleOutput() == null)
              return new ResponseEntity<>("Errors" , HttpStatus.PAYMENT_REQUIRED);
@@ -53,7 +54,6 @@ public class TarrInputController implements TarrApi {
       {
           return new ResponseEntity<>("Errors" , HttpStatus.INTERNAL_SERVER_ERROR);
       }
-
     }
 
     @RequestMapping(value = "/convertZip",
@@ -61,7 +61,7 @@ public class TarrInputController implements TarrApi {
             headers = "Accept=*",
             method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> tarr2fhirmulti(@ApiParam(value = "The file to upload.") @Valid @RequestPart(value="upfile", required=false) MultipartFile upfile) {
+    public ResponseEntity<String> tarr2fhirmulti(@ApiParam(value = "The file to upload.") @Valid @RequestPart(value="upfile", required=false) MultipartFile upfile, @RequestParam String labName, @RequestParam String reportingCenter, @RequestParam String sampleType,  @RequestParam String crid, @RequestParam String relationship) {
         try {
             MultipartFile aMPF = (MultipartFile)upfile;
             if (aMPF.isEmpty())
@@ -70,6 +70,8 @@ public class TarrInputController implements TarrApi {
             ParseInputFiles aParser = new ParseInputFiles();
             ZipFile aZipFile = new ZipFile(convert(aMPF));
             aParser.unzipFile(aZipFile);
+            aParser.setMetaData(labName, reportingCenter, sampleType, crid, relationship);
+            aParser.process();
             return new ResponseEntity<>(aParser.getMyFhirBundleOutput(), HttpStatus.OK);
         }
         catch (Exception e)
