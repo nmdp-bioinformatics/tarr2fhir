@@ -26,6 +26,7 @@ import org.nmdp.fhirsubmission.hapi.models.ExtensionSetup;
 import org.nmdp.fhirsubmission.hapi.models.FhirGuid;
 import org.nmdp.gendxdatamodels.LocusTARR;
 import org.nmdp.tarrbean.SampleBean;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,19 @@ public class DiagnosticReportMap implements Converter<SampleBean, DiagnosticRepo
         DiagnosticReport aDiagnosticReport = new DiagnosticReport();
         aDiagnosticReport.setStatus(DiagnosticReport.DiagnosticReportStatus.FINAL);
         ExtensionSetup aExtensions = new ExtensionSetup();
-        aSampleXml.getMyListLocusTarr().stream().forEach(aLocus -> createGlStringCodableConcept(aLocus, aExtensions));
+        StringBuilder aCombinedGlString = new StringBuilder();
+        aCombinedGlString.append("hla#");
+        String aAlleleVersion = aSampleXml.getMyListLocusTarr().get(0).getAlleleDB().getVersion();
+//                theLocus.getAlleleDB().getVersion();
+        aAlleleVersion = aAlleleVersion.substring(aAlleleVersion.indexOf("HLA ") + 4);
+        aCombinedGlString.append(aAlleleVersion+"#");
+        aSampleXml.getMyListLocusTarr().stream().forEach(aLocus -> createCombinedGlString(aLocus, aCombinedGlString));
+        createGlStringCodableConcept(aCombinedGlString, aExtensions);
+
+        if (!StringUtils.isEmpty(aSampleXml.getMySampleType()) && !aSampleXml.getMySampleType().equals("undefined"))
+        {
+            createExtensionCodeableConcept(aSampleXml.getMySampleType(), aExtensions);
+        }
         aDiagnosticReport.setExtension(aExtensions.getMyExtensions());
 
         CodeableConcept aDRCodableConcept = new CodeableConcept();
@@ -59,22 +72,63 @@ public class DiagnosticReportMap implements Converter<SampleBean, DiagnosticRepo
         aMeta.setProfile(aList);
         aDiagnosticReport.setMeta(aMeta);
 
+//        if (!StringUtils.isEmpty(aSampleXml.getMyCrid()) && !aSampleXml.getMyCrid().equals("undefined"))
+//        {
+//            createRecipientRefExtension(aExtensions, aSampleXml.getMyCrid());
+//        }
+        if (!StringUtils.isEmpty(aSampleXml.getMyRelationship()) && !aSampleXml.getMyRelationship().equals("undefined"))
+        {
+            createRecRelExtension(aExtensions, aSampleXml.getMyRelationship());
+        }
         aDiagnosticReport.setId(FhirGuid.genereateUrn());
         return aDiagnosticReport;
     }
 
-    public void createGlStringCodableConcept(LocusTARR theLocus, ExtensionSetup theExtensions)
+    public void createExtensionCodeableConcept(String theSampleType, ExtensionSetup theExtensions)
+    {
+        CodeableConcept aCodableConcept = new CodeableConcept();
+        CodingSetup aCodingSetup = new CodingSetup();
+        aCodingSetup.addCoding("http://terminology.cibmtr.org/codesystem/subject-type", theSampleType, "");
+        aCodableConcept.setCoding(aCodingSetup.getMyCodingList());
+        theExtensions.createExtension("http://fhir.nmdp.org/ig/hla-reporting/StructureDefinition/subject-type-extension", aCodableConcept);
+    }
+
+    public void createGlStringCodableConcept(StringBuilder theCombinedGlString, ExtensionSetup theExtensions)
+    {
+//        String aGlString  = theLocus.getTypingResult().getGLString();
+//        String aLocusName = theLocus.getName();
+//        String aGlStringLocusName = aLocusName.substring(aLocusName.indexOf("-")+1);
+//        aGlString = aGlString.replaceAll(aGlStringLocusName, aLocusName);
+//        String aAlleleVersion = theLocus.getAlleleDB().getVersion();
+//        aAlleleVersion = aAlleleVersion.substring(aAlleleVersion.indexOf("HLA ") + 4);
+        CodeableConcept aCodableConcept = new CodeableConcept();
+        CodingSetup aCodingSetup = new CodingSetup();
+        String theFullGlString = theCombinedGlString.toString();
+        aCodingSetup.addCoding("http://glstring.org", theFullGlString.substring(0, theFullGlString.length()-1), "");
+        aCodableConcept.setCoding(aCodingSetup.getMyCodingList());
+        theExtensions.createExtension("http://fhir.nmdp.org/ig/hla-reporting/StructureDefinition/hla-genotype-summary", aCodableConcept);
+    }
+
+    private void createCombinedGlString(LocusTARR theLocus, StringBuilder theCombinedGlString)
     {
         String aGlString  = theLocus.getTypingResult().getGLString();
         String aLocusName = theLocus.getName();
         String aGlStringLocusName = aLocusName.substring(aLocusName.indexOf("-")+1);
         aGlString = aGlString.replaceAll(aGlStringLocusName, aLocusName);
-        String aAlleleVersion = theLocus.getAlleleDB().getVersion();
-        aAlleleVersion = aAlleleVersion.substring(aAlleleVersion.indexOf("HLA ") + 4);
+        theCombinedGlString.append(aGlString + "~");
+    }
+
+//    private void createRecipientRefExtension(ExtensionSetup theExtension, String theCrid)
+//    {
+//
+//    }
+
+    private void createRecRelExtension(ExtensionSetup theExtension, String theRel)
+    {
         CodeableConcept aCodableConcept = new CodeableConcept();
         CodingSetup aCodingSetup = new CodingSetup();
-        aCodingSetup.addCoding("http://glstring.org", "hla#"+aAlleleVersion+"#"+aGlString, "");
+        aCodingSetup.addCoding("http://cibmtr.org/codesystem/recipient-relationship", theRel, "");
         aCodableConcept.setCoding(aCodingSetup.getMyCodingList());
-        theExtensions.createExtension("http://fhir.nmdp.org/ig/hla-reporting/StructureDefinition/hla-genotype-summary", aCodableConcept);
+        theExtension.createExtension("http://fhir.nmdp.org/hla-reporting/StructureDefinition/recipient-relationship-extension", aCodableConcept);
     }
 }

@@ -6,8 +6,8 @@ info:
   description: Convert Gendx Xml files from Versiti to FHIR
 
 schemes:
-- https
-- http
+  - https
+  - http
 
 basePath: /v1
 
@@ -23,6 +23,31 @@ paths:
       - in: body
         name: xml
         required: true
+        schema:
+          type: string
+      - in: body
+        name: labName
+        required: false
+        schema:
+          type: string
+      - in: body
+        name: reportingCenter
+        required: false
+        schema:
+          type: string
+      - in: body
+        name: sampleType
+        required: false
+        schema:
+          type: string
+      - in: body
+        name: crid
+        required: false
+        schema:
+          type: string
+      - in: body
+        name: relationship
+        required: false
         schema:
           type: string
       responses:
@@ -46,6 +71,31 @@ paths:
           type: file
           description: The file to upload.
           x-mimetype: application/zip
+        - in: query
+          name: labName
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: reportingCenter
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: sampleType
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: crid
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: relationship
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           description: Return the json bundle

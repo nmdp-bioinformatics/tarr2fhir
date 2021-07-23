@@ -18,6 +18,7 @@ package org.nmdp.fhirsubmission.hapi.models;
 import org.hl7.fhir.r4.model.Provenance;
 import org.hl7.fhir.r4.model.Reference;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,5 +40,14 @@ public class ProvenanceResource
     {
         theReferences.stream().filter(Objects::nonNull)
                 .forEach(aRefString -> myProvenance.addTarget(new Reference(aRefString)));
+    }
+
+    public void setAgent(String theDeviceResource)
+    {
+        List<Provenance.ProvenanceAgentComponent> aProvAgents = new ArrayList<>();
+        Provenance.ProvenanceAgentComponent aProvAgent = new Provenance.ProvenanceAgentComponent();
+        aProvAgent.setWho(new Reference(theDeviceResource));
+        aProvAgents.add(aProvAgent);
+        myProvenance.setAgent(aProvAgents);
     }
 }

@@ -42,8 +42,11 @@ public class DeviceResource {
         myDevice.setDeviceName(aDNameList);
         myDevice.setText((new NarrativeText()).
                 getNarrative("software device: Tarr2Fhir"));
+        List<Device.DeviceVersionComponent> deviceVersions = new ArrayList<>();
+        Device.DeviceVersionComponent aDeviceVersion = new Device.DeviceVersionComponent();
+        aDeviceVersion.setValue("1.0");
+        deviceVersions.add(aDeviceVersion);
+        myDevice.setVersion(deviceVersions);
         myDevice.setId(FhirGuid.genereateUrn());
-        theProvenanceReferences.add(myDevice.getIdElement().getValue());
-
     }
 }
