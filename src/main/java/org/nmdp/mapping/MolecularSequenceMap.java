@@ -48,7 +48,9 @@ public class MolecularSequenceMap implements Converter<LocusTARR, MolecularSeque
         MolecularSequences aMSs = new MolecularSequences();
         String alleleVersion = locus.getAlleleDB().getVersion();
         List<MolecularSequence> aMSList = new ArrayList<>();
-        List<AnnotatedAllele> annotatedAlleleList = locus.getAnnotatedAlleles().getAnnotatedAllele();
+        List<AnnotatedAllele> annotatedAlleleList = locus.getAnnotatedAlleles() != null ? locus.getAnnotatedAlleles().getAnnotatedAllele() : new ArrayList<>();
+        if (annotatedAlleleList.size() == 0)
+            return aMSs;
         annotatedAlleleList.stream().filter(Objects::nonNull)
                 .forEach(aAA -> extractSequence(aAA, aMSList, alleleVersion));
         aMSs.setMyMolecularSequences(aMSList);

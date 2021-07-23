@@ -52,9 +52,11 @@ export class UploadService {
   public upload(formData, uploaderComponent) {
     let headers = new HttpHeaders();
 
-    let box1 = uploaderComponent.box1value;
+    let box1 = uploaderComponent.labName;
     let box2 = uploaderComponent.box2value;
     let type = uploaderComponent.sampletype;
+    let crid = uploaderComponent.crid;
+    let rel = uploaderComponent.rel;
     if (uploaderComponent.choice === "zipFile")
     {
       let fD = new FormData();
@@ -62,7 +64,8 @@ export class UploadService {
       fD.append('labName', box1.name);
       fD.append('reportingCenter', box2);
       fD.append('sampleType', type);
-   //   headers = headers.set('Content-type', 'multipart/form-data; boundary=upfile');
+      fD.append('relationship', rel);
+      fD.append('crid', crid);
       headers = headers.set('Access-Control-Request-Headers', '*');
       this.httpClient.post(this.SERVER_URL_ZIP, fD, {
         headers: headers
@@ -71,22 +74,17 @@ export class UploadService {
         this.data = JSON.parse(JSON.stringify(res));
         console.log("Response received - " + JSON.stringify(res));
          uploaderComponent.announceDataReady(true);
-     //   return this.data;
       });
     }
     else if (uploaderComponent.choice === "xmlFile") {
       headers = headers.set("Content-Type", "application/xml");
-      // let fD = new FormData();
       let httpParams = new HttpParams();
       httpParams = httpParams.set('labName', box1.name);
       httpParams = httpParams.set('reportingCenter', box2);
       httpParams = httpParams.set('sampleType', type);
-      // fD.append('upfile', formData, formData.name);
-      // fD.append('labName', box1);
-      // fD.append('reportingCenter', box2);
-      // fD.append('sampleType', type);
+      httpParams = httpParams.set('relationship', rel);
+      httpParams = httpParams.set('crid', crid);
       this.httpClient.post(this.SERVER_URL_SINGLE, formData, {
-      // this.httpClient.post(this.SERVER_URL_SINGLE, formData, {
         headers: headers,
         params: httpParams
       }).subscribe((res) => {

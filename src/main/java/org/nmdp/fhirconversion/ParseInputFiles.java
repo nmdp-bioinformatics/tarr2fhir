@@ -107,11 +107,13 @@ public class ParseInputFiles
         setupFhir();
     }
 
-    public void setMetaData(String theLabName, String theReportingCenter, String theSampleType)
+    public void setMetaData(String theLabName, String theReportingCenter, String theSampleType, String crid, String relationship)
     {
         mySampleBean.setMyLabName(theLabName);
         mySampleBean.setMyReportingCenter(theReportingCenter);
         mySampleBean.setMySampleType(theSampleType);
+        mySampleBean.setMyCrid(crid);
+        mySampleBean.setMyRelationship(relationship);
     }
 
 }

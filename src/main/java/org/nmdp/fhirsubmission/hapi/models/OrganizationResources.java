@@ -2,26 +2,30 @@ package org.nmdp.fhirsubmission.hapi.models;
 
 import org.hl7.fhir.r4.model.Organization;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrganizationResources
 {
-    private Organization myOrganization;
+    private List<Organization> myOrganizations;
 
-    public OrganizationResources(){myOrganization = new Organization();}
+    public OrganizationResources(){myOrganizations = new ArrayList<>();
+    }
 
-    public Organization getMyOrganization() {
-        return myOrganization;
+    public List<Organization> getMyOrganizations() {
+        return myOrganizations;
     }
 
     public void generateOrganization(String theType, String theIdentifer, List<String> theProvenanceReferences)
     {
-        myOrganization.setText((new NarrativeText()).
+        Organization aOrg = new Organization();
+        aOrg.setText((new NarrativeText()).
             getNarrative("Organization: " +theType +" " + theIdentifer ));
-        myOrganization.setId(FhirGuid.genereateUrn());
+        aOrg.setId(FhirGuid.genereateUrn());
         IdentifierSetup aIS = new IdentifierSetup();
         aIS.setOrganizationIdentifier(theType, theIdentifer);
-        myOrganization.setIdentifier(aIS.getIdentifiers());
-        theProvenanceReferences.add(myOrganization.getIdElement().getValue());
+        aOrg.setIdentifier(aIS.getIdentifiers());
+        theProvenanceReferences.add(aOrg.getIdElement().getValue());
+        myOrganizations.add(aOrg);
     }
 }

@@ -15,14 +15,13 @@
 
 package org.nmdp.fhirconversion;
 
-import org.hl7.fhir.r4.model.DiagnosticReport;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Observation;
-import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.*;
 import org.modelmapper.ModelMapper;
 import org.nmdp.fhirsubmission.hapi.models.*;
 import org.nmdp.mapping.DiagnosticReportMap;
+import org.nmdp.mapping.SpecimenMap;
 import org.nmdp.tarrbean.SampleBean;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,11 +39,17 @@ public class FhirGenerator
         /**
          * Generate Organization Resources from Meta-data input in UI
          */
-        OrganizationResources aPerformerOrganization = new OrganizationResources();
-        aPerformerOrganization.generateOrganization("Lab (Performer)" , theSampleBean.getMyLabName(), aProvenanceReferences);
 
-        OrganizationResources aReportingCenterOrganization = new OrganizationResources();
-        aReportingCenterOrganization.generateOrganization("Reporting Organization " , theSampleBean.getMyReportingCenter(), aProvenanceReferences);
+        OrganizationResources aOrgResources = new OrganizationResources();
+        if (!StringUtils.isEmpty(theSampleBean.getMyLabName()) && !theSampleBean.getMyLabName().equals("undefined"))
+        {
+            aOrgResources.generateOrganization("Lab (Performer)", theSampleBean.getMyLabName(), aProvenanceReferences);
+        }
+
+        if (!StringUtils.isEmpty(theSampleBean.getMyReportingCenter()) && !theSampleBean.getMyReportingCenter().equals("undefined"))
+        {
+            aOrgResources.generateOrganization("Reporting Organization ", theSampleBean.getMyReportingCenter(), aProvenanceReferences);
+        }
 
         /*
          * Generate MolecularSequences from xml
@@ -72,15 +77,25 @@ public class FhirGenerator
         diagnosticReport.setSubject(new Reference().setIdentifier(aSpecimenId));
         aProvenanceReferences.add(diagnosticReport.getIdElement().getValue());
 
+        Specimen aSpecimen = mapper.map(theSampleBean, Specimen.class);
+        aProvenanceReferences.add(aSpecimen.getIdElement().getValue());
+
+//        Patient aPatient = mapper.map(theSampleBean, Patient.class);
+//        aProvenanceReferences.add(aPatient.getIdElement().getValue());
+
         DeviceResource aDR = new DeviceResource();
         aDR.generateDeviceResource(aProvenanceReferences);
 
         ProvenanceResource aPR = new ProvenanceResource();
         aPR.generateProvenanceResource(aProvenanceReferences);
+        aPR.setAgent(aDR.getMyDevice().getIdElement().getValue());
 
         myBundleResource.addSequences(aMS.getMyMolecularSequences());
-        myBundleResource.addResource(aPerformerOrganization.getMyOrganization());
-        myBundleResource.addResource(aReportingCenterOrganization.getMyOrganization());
+        myBundleResource.addResource(aSpecimen);
+        //myBundleResource.addResource(aPatient);
+        aOrgResources.getMyOrganizations().stream().filter(Objects::nonNull)
+                .forEach(aOrg -> myBundleResource.addResource(aOrg));
+//        myBundleResource.addResource(aReportingCenterOrganization.getMyOrganization());
         myBundleResource.addObservations(observations);
         myBundleResource.addResource(diagnosticReport);
         myBundleResource.addResource(aDR.getMyDevice());
@@ -101,6 +116,7 @@ public class FhirGenerator
     protected ModelMapper createMapper() {
         ModelMapper aMapper = new ModelMapper();
         aMapper.addConverter(new DiagnosticReportMap());
+        aMapper.addConverter(new SpecimenMap());
         return aMapper;
     }
 }

@@ -6,8 +6,8 @@ info:
   description: Convert Gendx Xml files from Versiti to FHIR
 
 schemes:
-- https
-- http
+  - https
+  - http
 
 basePath: /v1
 
@@ -37,6 +37,16 @@ paths:
           type: string
       - in: body
         name: sampleType
+        required: false
+        schema:
+          type: string
+      - in: body
+        name: crid
+        required: false
+        schema:
+          type: string
+      - in: body
+        name: relationship
         required: false
         schema:
           type: string
@@ -73,6 +83,16 @@ paths:
             type: string
         - in: query
           name: sampleType
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: crid
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: relationship
           required: false
           schema:
             type: string
